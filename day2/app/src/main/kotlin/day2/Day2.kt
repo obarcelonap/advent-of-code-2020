@@ -4,18 +4,22 @@ import java.util.stream.Stream
 import kotlin.streams.toList
 
 fun main(args: Array<String>) {
-    val validPasswords = filterValidPasswords(getResourceAsLines())
+    val lines = getResourceAsLines().toList()
 
-    println("Found ${validPasswords.size} valid passwords")
+    val validPasswordsByOcurrencesRange = filterValidPasswords(lines, ::validatorByOccurrencesRange)
+    println("Part 1: found ${validPasswordsByOcurrencesRange.size} valid passwords")
+
+    val validPasswordsByUniqueIndexAssertion = filterValidPasswords(lines, ::validatorByUniqueIndexAssertion)
+    println("Part 2: found ${validPasswordsByUniqueIndexAssertion.size} valid passwords")
 }
 
-fun filterValidPasswords(lines: Stream<String>): List<Pair<Policy, Password>> {
+fun filterValidPasswords(lines: Iterable<String>, policyValidator: (Policy) -> (Password) -> Boolean): List<Pair<Policy, Password>> {
     return lines.map { parsePolicyAndPassword(it) }
-            .filter { (policy, password) -> validator(policy)(password) }
+            .filter { (policy, password) -> policyValidator(policy)(password) }
             .toList()
 }
 
-data class Policy(val lowerBound: Int, val upperBound: Int, val character: Char)
+data class Policy(val firstInt: Int, val secondInt: Int, val character: Char)
 data class Password(val value: String)
 
 fun parsePolicyAndPassword(line: String): Pair<Policy, Password> {
@@ -28,11 +32,22 @@ fun parsePolicyAndPassword(line: String): Pair<Policy, Password> {
     return Pair(policy, password)
 }
 
-fun validator(policy: Policy): (Password) -> Boolean {
+fun validatorByOccurrencesRange(policy: Policy): (Password) -> Boolean {
     return fun(password: Password): Boolean {
+        val (lowerBound, upperBound, character) = policy
         val occurrences = password.value.asIterable()
-                .count { it == policy.character }
-        return occurrences in policy.lowerBound..policy.upperBound
+                .count { it == character }
+        return occurrences in lowerBound..upperBound
+    }
+}
+
+fun validatorByUniqueIndexAssertion(policy: Policy): (Password) -> Boolean {
+    return fun(password: Password): Boolean {
+        val (firstIndex, secondIndex, character) = policy
+        val firstIndexChar = password.value[firstIndex - 1]
+        val secondIndexChar = password.value[secondIndex - 1]
+        return (firstIndexChar == character || secondIndexChar == character)
+                && firstIndexChar != secondIndexChar
     }
 }
 
