@@ -4,9 +4,7 @@ import kotlin.streams.toList
 
 fun main(args: Array<String>) {
     val result = 2020
-    val numbers: List<Int> = object {}.javaClass.getResourceAsStream("/input")
-            .bufferedReader()
-            .lines()
+    val numbers: List<Int> = getResourceAsLines()
             .map { it.trim().toIntOrNull() }
             .toList()
             .filterNotNull()
@@ -21,3 +19,7 @@ fun main(args: Array<String>) {
     triplets.map { " ${it.first} + ${it.second} + ${it.third} = $result => ${it.first} * ${it.second} * ${it.third} = ${it.first * it.second * it.third}" }
             .forEach { println(it) }
 }
+
+fun getResourceAsLines() = object {}.javaClass.getResourceAsStream("/input")
+        .bufferedReader()
+        .lines()
