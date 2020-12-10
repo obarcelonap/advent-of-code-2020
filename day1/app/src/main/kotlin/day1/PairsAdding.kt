@@ -1,9 +1,8 @@
 package day1
 
-fun <T> List<T>.tail() = drop(1)
 
 fun pairsAdding(result: Int, numbers: List<Int>): List<Pair<Int, Int>> {
-    if (numbers.isEmpty()) {
+    if (numbers.size < 2) {
         return emptyList()
     }
 
