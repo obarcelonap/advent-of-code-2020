@@ -7,7 +7,13 @@ fun main(args: Array<String>) {
     println("Part 1: found $occupiedSeats occupied seats in seat plan")
 }
 
-abstract class Position(val icon: Char)
+abstract class Position(val icon: Char) {
+    fun countOccupied() = when (this) {
+        is Occupied -> 1
+        else -> 0
+    }
+}
+
 object Floor : Position('.')
 abstract class Seat(icon: Char) : Position(icon)
 object Occupied : Seat('#')
@@ -20,12 +26,6 @@ fun stabilizeSeatPlan(seatPlan: SeatPlan) = generateSequence(seatPlan, {
 })
         .last()
 
-
-fun countOccupiedSeats(position: Position) =
-        when (position) {
-            is Occupied -> 1
-            else -> 0
-        }
 
 fun newSeatPlan(text: String): SeatPlan = text.lines()
         .map {
@@ -41,7 +41,7 @@ fun newSeatPlan(text: String): SeatPlan = text.lines()
 
 fun countOccupiedSeats(seatPlan: SeatPlan) =
         seatPlan.flatten()
-                .sumBy { countOccupiedSeats(it) }
+                .sumBy { it.countOccupied() }
 
 fun iterateSeatPlan(seatPlan: SeatPlan): SeatPlan {
     val maxX = seatPlan.size
@@ -49,7 +49,7 @@ fun iterateSeatPlan(seatPlan: SeatPlan): SeatPlan {
 
     fun countOcuppied(x: Int, y: Int): Int =
             if (x !in 0 until maxX || y !in 0 until maxY) 0
-            else countOccupiedSeats(seatPlan[x][y])
+            else seatPlan[x][y].countOccupied()
 
     fun countAdjacentOccupiedSeats(x: Int, y: Int): Int =
             listOf(
