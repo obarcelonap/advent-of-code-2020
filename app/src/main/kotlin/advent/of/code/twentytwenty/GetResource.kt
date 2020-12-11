@@ -6,3 +6,6 @@ fun getResourceAsLines(resourcePath: String): List<String> = object {}.javaClass
         .bufferedReader()
         .lines()
         .toList()
+
+fun getResourceAsText(resourcePath: String): String = object {}.javaClass.getResource(resourcePath)
+        .readText()
