@@ -1,19 +1,69 @@
 package advent.of.code.twentytwenty
 
-fun <T> identity(x: T): T = x
+import java.lang.Long.parseLong
 
-fun applyMask(value: Int, mask: String): Int {
-    val fold = mask.mapIndexed { index, character ->
-        when (character) {
-            '1' -> fun(v: Int): Int { return v or shiftingLeft(mask.length - index - 1) }
-            '0' -> fun(v: Int): Int { return v and shiftingLeft(mask.length - index - 1).inv() }
-            else -> ::identity
-        }
-    }
-            .fold(value, { v, f -> f(v) })
+typealias Mask = String
+typealias Memory = Map<Long, Long>
+typealias MaskedMemory = Pair<Memory, Mask>
 
-    println(Integer.toBinaryString(fold))
-    return fold
+fun main() {
+    val sum = memorySum(getResourceAsText("/day14-input"))
+    println("Part1: final memory sum is $sum")
 }
 
-private fun shiftingLeft(numberOfShifts: Int) = 1 shl numberOfShifts
+fun memorySum(input: String): Long {
+    val initialMask = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    val initialMemory = emptyMap<Long, Long>()
+
+    val (finalMemory) = input.lines()
+            .map(fun(line: String): (mem: MaskedMemory) -> MaskedMemory {
+                if (line.startsWith("mask")) {
+                    return { (mem) -> Pair(mem, parseMask(line)) }
+                }
+                return { (mem, mask) ->
+                    val (address, value) = parseMemoryWrite(line)
+                    Pair(mem + Pair(address, applyMask(value, mask)), mask)
+                }
+            })
+            .fold(Pair(initialMemory, initialMask), { mem, instruction -> instruction(mem) })
+
+    return finalMemory.map { (_, value) -> value }
+            .sum()
+}
+
+
+fun applyMask(value: Long, mask: String): Long {
+    val onesMask = mask.map { character ->
+        when (character) {
+            '1' -> '1'
+            else -> '0'
+        }
+    }
+            .joinToBinaryLong()
+
+    val zerosMask = mask.map { character ->
+        when (character) {
+            '0' -> '1'
+            else -> '0'
+        }
+    }
+            .joinToBinaryLong()
+            .inv()
+
+    return value or onesMask and zerosMask
+}
+
+
+private fun <T> Iterable<T>.joinToBinaryLong(): Long {
+    return parseLong(joinToString(""), 2)
+}
+
+private fun parseMask(line: String): String = line.split("=")[1].trim()
+
+private fun parseMemoryWrite(line: String): Pair<Long, Long> {
+    val (addressTokens, value) = line.split("=")
+    val re = Regex("[^0-9]")
+    val address = re.replace(addressTokens.trim(), "").toLong()
+
+    return Pair(address, value.trim().toLong())
+}
