@@ -24,4 +24,25 @@ class Day3Test {
 
         assertEquals(7, trees)
     }
+
+    @Test
+    fun shouldSatisfyPuzzleExampleOfPart2() {
+        val grid = """
+            ..##.......
+            #...#...#..
+            .#....#..#.
+            ..#.#...#.#
+            .#...##..#.
+            ..#.##.....
+            .#.#.#....#
+            .#........#
+            #.##...#...
+            #...##....#
+            .#..#...#.#
+        """.trimIndent()
+        val slopes = listOf(Pair(1, 1), Pair(3, 1), Pair(5, 1), Pair(7, 1), Pair(1, 2))
+        val trees = countTrees(grid, slopes)
+
+        assertEquals(336, trees)
+    }
 }

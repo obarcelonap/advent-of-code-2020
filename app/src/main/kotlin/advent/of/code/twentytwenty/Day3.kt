@@ -2,9 +2,14 @@ package advent.of.code.twentytwenty
 
 fun main() {
     val input = getResourceAsText("/day3-input")
-    val part1Count = countTrees(input, Pair(3, 1))
+
+    val slope = Pair(3, 1)
+    val part1Count = countTrees(input, slope)
     println("Part1: count of trees is $part1Count")
 
+    val slopes = listOf(Pair(1, 1), Pair(3, 1), Pair(5, 1), Pair(7, 1), Pair(1, 2))
+    val part2Count = countTrees(input, slopes)
+    println("Part2: count of trees is $part2Count")
 }
 
 sealed class Square {
@@ -20,6 +25,16 @@ sealed class Square {
 }
 
 fun countTrees(text: String, slope: Pair<Int, Int>): Int = countTrees(parseGrid(text), slope)
+
+fun countTrees(text: String, slopes: List<Pair<Int, Int>>): Int {
+    val grid = parseGrid(text)
+    return slopes.map { countTrees(grid, it) }
+            .multiply()
+}
+
+private fun Iterable<Int>.multiply(): Int {
+    return reduce { acc, e -> acc * e }
+}
 
 private fun countTrees(grid: List<List<Square>>, slope: Pair<Int, Int>): Int {
     fun navigateTilEnd(currentGrid: List<List<Square>>, position: Pair<Int, Int> = Pair(0, 0)): List<Square> {
