@@ -4,7 +4,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class Day1Test {
-    @Test fun shouldSatisfyPuzzleExampleOfPart1() {
+    @Test
+    fun shouldSatisfyPuzzleExampleOfPart1() {
         val pairs = pairsAdding(
                 2020,
                 listOf(
@@ -19,7 +20,8 @@ class Day1Test {
         assertEquals(listOf(Pair(1721, 299)), pairs)
     }
 
-    @Test fun shouldSatisfyPuzzleExampleOfPart2() {
+    @Test
+    fun shouldSatisfyPuzzleExampleOfPart2() {
         val triplets = tripletsAdding(
                 2020,
                 listOf(
